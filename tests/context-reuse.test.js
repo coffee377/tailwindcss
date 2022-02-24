@@ -85,3 +85,39 @@ it('a build re-uses the context across multiple files with the same config', asy
   // And none of this should have resulted in multiple contexts being created
   expect(sharedState.contextSourcesMap.size).toBe(1)
 })
+
+it('passing in different css invalidates the context if it contains @tailwind directives', async () => {
+  sharedState.contextInvalidationCount = 0
+
+  let from = path.resolve(__filename)
+
+  // Save the file a handful of times with no changes
+  // This builds the context at most once
+  for (let n = 0; n < 5; n++) {
+    await run(`@tailwind utilities;`, configPath, `${from}?id=1`)
+  }
+
+  expect(sharedState.contextInvalidationCount).toBe(1)
+
+  // Save the file twice with a change
+  // This should rebuild the context again but only once
+  await run(`@tailwind utilities; .foo {}`, configPath, `${from}?id=1`)
+  await run(`@tailwind utilities; .foo {}`, configPath, `${from}?id=1`)
+
+  expect(sharedState.contextInvalidationCount).toBe(2)
+
+  // Save the file twice with a content but not length change
+  // This should rebuild the context two more times
+  await run(`@tailwind utilities; .bar {}`, configPath, `${from}?id=1`)
+  await run(`@tailwind utilities; .baz {}`, configPath, `${from}?id=1`)
+
+  expect(sharedState.contextInvalidationCount).toBe(4)
+
+  // Save a file with a change that does not affect the context
+  // No invalidation should occur
+  await run(`.foo { @apply mb-1; }`, configPath, `${from}?id=2`)
+  await run(`.foo { @apply mb-1; }`, configPath, `${from}?id=2`)
+  await run(`.foo { @apply mb-1; }`, configPath, `${from}?id=2`)
+
+  expect(sharedState.contextInvalidationCount).toBe(4)
+})
