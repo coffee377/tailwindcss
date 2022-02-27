@@ -5,6 +5,7 @@
 /peers
 /example
 .vscode
+.idea
 .DS_Store
 tailwind.config.js
 index.html
