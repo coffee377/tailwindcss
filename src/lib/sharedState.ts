@@ -6,9 +6,11 @@ export const contextMap = new Map()
 export const configContextMap = new Map()
 export const contextSourcesMap = new Map()
 export const sourceHashMap = new Map()
-export const NOT_ON_DEMAND = new String('*')
+export const NOT_ON_DEMAND = String('*')
 
-export function resolveDebug(debug) {
+export type DebugValue = 'true' | 'false' | '1' | '0' | string | undefined
+
+export function resolveDebug(debug: DebugValue) {
   if (debug === undefined) {
     return false
   }
@@ -32,7 +34,7 @@ export function resolveDebug(debug) {
     return true
   }
 
-  let debuggers = debug.split(',').map((d) => d.split(':')[0])
+  const debuggers = debug.split(',').map((d) => d.split(':')[0])
 
   // Ignoring tailwindcss
   if (debuggers.includes('-tailwindcss')) {
@@ -40,9 +42,5 @@ export function resolveDebug(debug) {
   }
 
   // Including tailwindcss
-  if (debuggers.includes('tailwindcss')) {
-    return true
-  }
-
-  return false
+  return debuggers.includes('tailwindcss')
 }

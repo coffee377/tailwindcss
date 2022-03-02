@@ -6,8 +6,9 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
+  "parser": "@typescript-eslint/parser",
   "extends": ["prettier"],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "@typescript-eslint"],
   "rules": {
     "camelcase": ["error", { "allow": ["^unstable_"] }],
     "no-unused-vars": [2, { "args": "all", "argsIgnorePattern": "^_" }],

@@ -4,6 +4,7 @@
   "description": "A utility-first CSS framework for rapidly building custom user interfaces.",
   "license": "MIT",
   "main": "lib/index.js",
+  "types": "types/index.d.ts",
   "style": "dist/tailwind.css",
   "repository": "https://github.com/tailwindlabs/tailwindcss.git",
   "bugs": "https://github.com/tailwindlabs/tailwindcss/issues",
@@ -13,23 +14,25 @@
     "tailwindcss": "lib/cli.js"
   },
   "scripts": {
-    "preswcify": "npm run generate:plugin-list && rimraf lib",
-    "swcify": "swc src --out-dir lib --copy-files",
+    "preswcify": "rimraf lib types && npm run generate:plugin-list && npm run generate:declaration-file",
+    "swcify": "swc src --ignore **/*.d.ts --out-dir lib --copy-files",
     "postswcify": "esbuild lib/cli-peer-dependencies.js --bundle --platform=node --outfile=peers/index.js",
     "rebuild-fixtures": "npm run swcify && node -r @swc/register scripts/rebuildFixtures.js",
     "prepublishOnly": "npm install --force && npm run swcify",
-    "style": "eslint .",
+    "style": "eslint . --fix",
     "pretest": "npm run generate:plugin-list",
     "test": "jest",
     "test:integrations": "npm run test --prefix ./integrations",
     "install:integrations": "node scripts/install-integrations.js",
     "posttest": "npm run style",
-    "generate:plugin-list": "node -r @swc/register scripts/create-plugin-list.js"
+    "generate:plugin-list": "node -r @swc/register scripts/create-plugin-list.js",
+    "generate:declaration-file": "tsc"
   },
   "files": [
     "src/*",
     "cli/*",
     "lib/*",
+    "types/*",
     "peers/*",
     "scripts/*.js",
     "stubs/*.stub.js",
@@ -42,6 +45,8 @@
     "@swc/core": "^1.2.127",
     "@swc/jest": "^0.2.17",
     "@swc/register": "^0.1.10",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
     "autoprefixer": "^10.4.2",
     "cssnano": "^5.0.17",
     "esbuild": "^0.14.21",
@@ -53,7 +58,8 @@
     "prettier": "^2.5.1",
     "prettier-plugin-tailwindcss": "^0.1.7",
     "rimraf": "^3.0.0",
-    "source-map-js": "^1.0.2"
+    "source-map-js": "^1.0.2",
+    "typescript": "^4.5.5"
   },
   "peerDependencies": {
     "autoprefixer": "^10.0.2",
